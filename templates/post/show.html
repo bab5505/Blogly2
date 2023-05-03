@@ -14,13 +14,13 @@
 <form>
   <button class="btn btn-outline-primary"
           formmethod="GET"
-          formaction="/users/{{ post.user_id }}">Cancel</button>
+          formaction="/user/{{ post.user_id }}">Cancel</button>
   <button class="btn btn-primary"
           formmethod="GET"
-          formaction="/posts/{{ post.id }}/edit">Edit</button>
+          formaction="/post/{{ post.id }}/edit">Edit</button>
   <button class="btn btn-danger"
           formmethod="POST"
-          formaction="/posts/{{ post.id }}/delete">Delete</button>
+          formaction="/post/{{ post.id }}/delete">Delete</button>
 </form>
 
 {% endblock %}

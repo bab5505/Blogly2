@@ -9,10 +9,10 @@ db = SQLAlchemy()
 DEFAULT_IMAGE_URL = "https://www.freeiconspng.com/uploads/icon-user-blue-symbol-people-person-generic--public-domain--21.png"
 
 
-class Post(db.Model):
-    
-    
-    __tablename__ = "post"
+class User(db.Model):
+    """Site user."""
+
+    __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.Text, nullable=False)
@@ -40,7 +40,7 @@ class Post(db.Model):
         db.DateTime,
         nullable=False,
         default=datetime.datetime.now)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     @property
     def friendly_date(self):

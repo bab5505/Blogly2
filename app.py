@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, render_template
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, Post
+from models import db, connect_db, Post, User
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blogly'
@@ -23,8 +23,8 @@ with app.app_context():
 def root():
     """Show recent list of posts, most-recent first."""
 
-    posts = Post.query.order_by(Post.created_at.desc()).limit(5).all()
-    return render_template("post/homepage.html", posts=posts)
+    post = Post.query.order_by(Post.created_at.desc()).limit(5).all()
+    return render_template("post/homepage.html", post=post)
 
 
 
@@ -37,23 +37,23 @@ def page_not_found(e):
 
 # User route
 
-@app.route('/users')
-def users_index():
+@app.route('/user')
+def user_index():
     """Show a page with info on all users"""
 
-    users = User.query.order_by(User.last_name, User.first_name).all()
-    return render_template('users/index.html', users=users)
+    user = User.query.order_by(User.last_name, User.first_name).all()
+    return render_template('user/index.html', user=user)
 
 
-@app.route('/users/new', methods=["GET"])
-def users_new_form():
+@app.route('/user/new', methods=["GET"])
+def user_new_form():
     """Show a form to create a new user"""
 
-    return render_template('users/new.html')
+    return render_template('user/new.html')
 
 
-@app.route("/users/new", methods=["POST"])
-def users_new():
+@app.route("/user/new", methods=["POST"])
+def user_new():
     """Handle form submission for creating a new user"""
 
     new_user = User(
@@ -65,27 +65,27 @@ def users_new():
     db.session.commit()
     flash(f"User {new_user.full_name} added.")
 
-    return redirect("/users")
+    return redirect("/user")
 
 
-@app.route('/users/<int:user_id>')
-def users_show(user_id):
+@app.route('/user/<int:user_id>')
+def user_show(user_id):
     """Show a page with info on a specific user"""
 
     user = User.query.get_or_404(user_id)
-    return render_template('users/show.html', user=user)
+    return render_template('user/show.html', user=user)
 
 
-@app.route('/users/<int:user_id>/edit')
-def users_edit(user_id):
+@app.route('/user/<int:user_id>/edit')
+def user_edit(user_id):
     """Show a form to edit an existing user"""
 
     user = User.query.get_or_404(user_id)
-    return render_template('users/edit.html', user=user)
+    return render_template('user/edit.html', user=user)
 
 
-@app.route('/users/<int:user_id>/edit', methods=["POST"])
-def users_update(user_id):
+@app.route('/user/<int:user_id>/edit', methods=["POST"])
+def user_update(user_id):
     """Handle form submission for updating an existing user"""
 
     user = User.query.get_or_404(user_id)
@@ -97,11 +97,11 @@ def users_update(user_id):
     db.session.commit()
     flash(f"User {user.full_name} edited.")
 
-    return redirect("/users")
+    return redirect("/user")
 
 
-@app.route('/users/<int:user_id>/delete', methods=["POST"])
-def users_destroy(user_id):
+@app.route('/user/<int:user_id>/delete', methods=["POST"])
+def user_destroy(user_id):
     """Handle form submission for deleting an existing user"""
 
     user = User.query.get_or_404(user_id)
@@ -109,21 +109,21 @@ def users_destroy(user_id):
     db.session.commit()
     flash(f"User {user.full_name} deleted.")
 
-    return redirect("/users")
+    return redirect("/user")
 
 # Posts route
 
 
-@app.route('/users/<int:user_id>/posts/new')
-def posts_new_form(user_id):
+@app.route('/user/<int:user_id>/post/new')
+def post_new_form(user_id):
     """Show a form to create a new post for a specific user"""
 
     user = User.query.get_or_404(user_id)
-    return render_template('posts/new.html', user=user)
+    return render_template('post/new.html', user=user)
 
 
-@app.route('/users/<int:user_id>/posts/new', methods=["POST"])
-def posts_new(user_id):
+@app.route('/user/<int:user_id>/post/new', methods=["POST"])
+def post_new(user_id):
     """Handle form submission for creating a new post for a specific user"""
 
     user = User.query.get_or_404(user_id)
@@ -135,27 +135,27 @@ def posts_new(user_id):
     db.session.commit()
     flash(f"Post '{new_post.title}' added.")
 
-    return redirect(f"/users/{user_id}")
+    return redirect(f"/user/{user_id}")
 
 
-@app.route('/posts/<int:post_id>')
-def posts_show(post_id):
+@app.route('/post/<int:post_id>')
+def post_show(post_id):
     """Show a page with info on a specific post"""
 
     post = Post.query.get_or_404(post_id)
-    return render_template('posts/show.html', post=post)
+    return render_template('post/show.html', post=post)
 
 
-@app.route('/posts/<int:post_id>/edit')
-def posts_edit(post_id):
+@app.route('/post/<int:post_id>/edit')
+def post_edit(post_id):
     """Show a form to edit an existing post"""
 
     post = Post.query.get_or_404(post_id)
-    return render_template('posts/edit.html', post=post)
+    return render_template('post/edit.html', post=post)
 
 
-@app.route('/posts/<int:post_id>/edit', methods=["POST"])
-def posts_update(post_id):
+@app.route('/post/<int:post_id>/edit', methods=["POST"])
+def post_update(post_id):
     """Handle form submission for updating an existing post"""
 
     post = Post.query.get_or_404(post_id)
@@ -166,11 +166,11 @@ def posts_update(post_id):
     db.session.commit()
     flash(f"Post '{post.title}' edited.")
 
-    return redirect(f"/users/{post.user_id}")
+    return redirect(f"/user/{post.user_id}")
 
 
-@app.route('/posts/<int:post_id>/delete', methods=["POST"])
-def posts_destroy(post_id):
+@app.route('/post/<int:post_id>/delete', methods=["POST"])
+def post_destroy(post_id):
     """Handle form submission for deleting an existing post"""
 
     post = Post.query.get_or_404(post_id)
@@ -179,5 +179,5 @@ def posts_destroy(post_id):
     db.session.commit()
     flash(f"Post '{post.title} deleted.")
 
-    return redirect(f"/users/{post.user_id}")
+    return redirect(f"/user/{post.user_id}")
 
